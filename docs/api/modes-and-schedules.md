@@ -9,7 +9,7 @@ Le champ `modes` de `/device/me` est une **liste de chaînes**. On la remplace e
 
 | Valeur | Nom Davey | Effet |
 |---|---|---|
-| `MANUAL` | Manual Mode / « System On/Off » | Marche / arrêt du système. La cellule produit à la consigne `cellOutput`, la pompe VSD tourne à `vsdPumpSpeed` |
+| `MANUAL` | Manual Mode / « System On/Off » | Marche / arrêt du système. La cellule produit à la consigne `cellOutput`. Si une pompe VSD Davey est reliée, elle tourne à `vsdPumpSpeed` |
 | `SPA` | Spa Mode | Production réduite de 80 %. Activable seulement **sans sonde ORP** |
 | `BOOST` | Boost Mode | Électrolyseur à 100 % pendant `boostDuration` heures (24 par défaut). L'ORP est ignoré pendant le boost |
 | `COVER` | Cover Mode | Volet fermé. Production réduite de 80 %, activable seulement **sans sonde ORP**. Détection automatique avec un volet motorisé raccordé |
@@ -72,10 +72,13 @@ Lecture (`/device/me`) : les valeurs numériques sont des **chaînes**.
 | `on` | Heure de début, en secondes depuis minuit. `21600` = 06:00 |
 | `off` | Heure de fin, en secondes depuis minuit. `32400` = 09:00 |
 | `days` | 7 caractères `0`/`1` : position 0 = **lundi** … position 6 = **dimanche** |
-| `speed` | Vitesse VSD pendant le créneau (2 / 4 / 6 / 8 / 10) |
+| `speed` | Vitesse VSD pendant le créneau (2 / 4 / 6 / 8 / 10). Sans effet sans pompe Davey compatible |
 
 Fonctionnement :
-- `SCHEDULE` **actif** : la filtration démarre et s'arrête selon les créneaux.
+- `SCHEDULE` **actif** : la filtration démarre et s'arrête selon les créneaux. Le contrôleur
+  ne commande la filtration qu'à travers une pompe Davey compatible. Sur les modèles européens,
+  l'EcoSalt2 est de toute façon alimenté par une horloge externe (voir
+  [models-and-firmware.md](models-and-firmware.md#pompe-vsd)).
 - `SCHEDULE` **inactif** : seule l'heure de fin s'applique. Les créneaux ne servent plus qu'à
   **arrêter** la filtration.
 - `edit-schedules` **remplace** la liste entière. Supprimer un créneau revient à renvoyer la

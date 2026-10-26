@@ -50,7 +50,7 @@
 | 9 | 401 après rafraîchissement | récursion sans limite | une seule nouvelle tentative | ✅ corrigé (branche `fix/security-hardening`) |
 | 10 | Log debug `Device data` | contient `token` et `certArn` de l'appareil | secrets masqués | ✅ corrigé (branche `fix/security-hardening`) |
 | 11 | `DaveyErrorBinarySensor` | toute valeur ≠ `NORMAL` (y compris `""` ou clé absente) → « problème » | `WARN` / `ERROR` = problème, `""` = pas de sonde | Basse |
-| 12 | `vsdPumpSpeed` | `select` 2/4/6/8/10 | 2/4/6/8/10 | ✅ conforme |
+| 12 | `vsdPumpSpeed` | `select` 2/4/6/8/10, toujours activé | 2/4/6/8/10, utile seulement avec une pompe Davey compatible | Basse : valeurs conformes, mais réglage sans effet sans pompe compatible. Créer l'entité désactivée par défaut |
 
 ## Règles d'usage de l'API non respectées par l'intégration
 

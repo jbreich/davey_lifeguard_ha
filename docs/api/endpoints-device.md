@@ -67,8 +67,8 @@ Exemple réel (anonymisé) :
 | `orpTarget` | int | Consigne ORP (mV) |
 | `tempTarget` | float/int | Consigne de température de l'eau, en °C (utilisée avec une pompe à chaleur) |
 | `cellOutput` | int (%) | **Consigne** de production de la cellule sans sonde ORP. À ne pas confondre avec `status.cellOutput`, qui est la production instantanée |
-| `vsdPumpSpeed` | int | Vitesse **par défaut** de la pompe à vitesse variable (VSD). Valeurs valides : 2, 4, 6, 8, 10 |
-| `isVsdPumpConnected` | bool | Une pompe VSD est déclarée |
+| `vsdPumpSpeed` | int | Vitesse **par défaut** de la pompe à vitesse variable (VSD). Valeurs valides : 2, 4, 6, 8, 10. Sans effet sans pompe Davey compatible (voir [models-and-firmware.md](models-and-firmware.md#pompe-vsd)) |
+| `isVsdPumpConnected` | bool | Une pompe VSD est **déclarée** dans la configuration. Ce n'est pas une détection : la valeur peut être `true` sans pompe compatible |
 | `boostDuration` | int (heures) | Durée du mode BOOST : 6, 12, 18 ou 24 (24 par défaut) |
 | `backwashDuration` | int (**secondes**) | Durée du mode BACKWASH : 2, 3, 4 ou 5 min, soit 120 à 300 s (120 par défaut) |
 | `modes` | string[] | Modes actifs (voir [modes-and-schedules.md](modes-and-schedules.md)) |
@@ -169,7 +169,7 @@ Modifie les consignes. Corps :
 | `temp` | Double | `tempTarget` (15 à 39 °C, par pas de 1). Pour ne changer que la température, on peut n'envoyer que `temp`, sans `ph`, `orp` ni `salinity` |
 | `cell` | Integer | Consigne de production de la cellule en % (0 à 100, par pas de 5), seulement sans sonde ORP. **Le nom est `cell`, pas `cellOutput`** |
 | `*Connected` | bool | Recopiés depuis `/device/status`. Changer l'un d'eux **active ou désactive la sonde** correspondante |
-| `isVsdPumpConnected` | bool | Déclaration d'une pompe VSD |
+| `isVsdPumpConnected` | bool | Déclaration d'une pompe VSD (pas une détection) |
 | `vsdPumpSpeed` | int | Vitesse VSD par défaut : 2 / 4 / 6 / 8 / 10 |
 | `boostDuration` | int (h) | 6 / 12 / 18 / 24 |
 | `backwashDuration` | int (s) | 120 / 180 / 240 / 300 |

@@ -6,7 +6,7 @@
   préfixe du numéro de série, `region`, `nipperCell`, `saltStatus` et `io`.
 - Aucune fonction connue ne dépend de la version du **firmware** ni de la **taille de cellule**.
 - Ce qui change réellement les fonctions disponibles : la **région**, les **sondes présentes**,
-  la **pompe à chaleur associée**, la **pompe VSD**, le **rôle** de l'utilisateur et la
+  la **pompe à chaleur associée**, une **pompe VSD Davey** reliée au contrôleur, le **rôle** de l'utilisateur et la
   **marque** (Davey ou Henden). Voir [business-rules.md](business-rules.md).
 
 ## 1. Gammes de produits
@@ -75,10 +75,31 @@ probablement comme l'Australie : plannings et pompe à chaleur disponibles (supp
 | `firmwareVersion` | firmware du **contrôleur Lifeguard**, au format `AA.BB.CC` | renvoyé dans `edit-schedules` |
 | `nipperVersion` | firmware de l'**électrolyseur** (EcoSalt2 / Nipper) | aucun connu |
 | `brand` | 0 observé sur un appareil Davey. Valeurs Henden inconnues | aucun connu |
-| `isVsdPumpConnected`, `vsdPumpSpeed` | pompe de filtration à vitesse variable déclarée | **oui** : réglage VSD |
+| `isVsdPumpConnected`, `vsdPumpSpeed` | pompe de filtration à vitesse variable **déclarée** dans la configuration. Ce n'est pas une détection | **oui**, seulement avec une pompe Davey compatible : réglage VSD (voir [Pompe VSD](#pompe-vsd)) |
 | `heatPump` | identifiant de pompe à chaleur. Nirvana = 17 caractères avec `-`, Aquark = plus de 5 caractères | **oui** : consigne de température |
 | `acidPump`, `filtrationPump` | déclarés via `POST /device/update` (non testé) | aucun connu |
 | `inUse` | sens inconnu | aucun connu |
+
+### Pompe VSD
+
+- Seules les pompes Davey prévues pour le Lifeguard sont pilotables : **ProMaster PM400BT** et
+  **SilensorPro SP400BT** (manuel ProMatic Lifeguard, §4.6.3 et §9.1). Aucune compatibilité
+  n'est annoncée avec d'autres marques. Le contrôleur n'a pas de sortie de commande de pompe :
+  son câble RJ45 le relie à l'EcoSalt2.
+- `isVsdPumpConnected` et `vsdPumpSpeed` sont des **valeurs de configuration**. Elles ne
+  prouvent pas qu'une pompe répond : sur l'appareil de test, elles valent `true` et `8` alors
+  que la pompe de filtration est d'une autre marque et n'est pas pilotée par le contrôleur.
+- Sur la ProMaster PM400BT, la vitesse se règle avec une molette de 1 à 10 : environ 126 W en
+  position 1, 728 W en position 5 et 1 639 W en position 10, de 1 050 à 3 100 tr/min (fiche
+  technique Davey). Les valeurs 2, 4, 6, 8 et 10 de `vsdPumpSpeed` correspondent probablement
+  à ces positions (supposé).
+- Baisser la vitesse réduit le débit. Sous un certain seuil, le détecteur de débit de la
+  cellule coupe l'électrolyse et déclenche une alarme de débit faible. Le manuel conseille
+  alors d'augmenter la vitesse de la pompe.
+- Modèles européens (`DPLG…E`) : le Lifeguard doit rester **toujours sous tension**, et
+  l'EcoSalt2 doit être alimenté par une **horloge** ou une programmation externe (manuel
+  ProMatic Lifeguard, §12). Sans pompe Davey compatible, c'est donc cette horloge, et non le
+  contrôleur, qui fixe les heures de filtration et d'électrolyse.
 
 ## 3. Firmwares
 
@@ -114,7 +135,7 @@ Davey ne publie **ni liste de versions, ni notes de version**. Les seuls repère
 | Manuel ChloroMatic Nipper (2020), écran de démarrage | Nipper `AU 15` | `V1.3.2` (le texte parle de `v1.2.1`) | ancien format `Vx.y.z` |
 | Même manuel, figure 11.1 | électrolyseur `EU 15L` | `V1.2.1` | idem |
 | Manuel ProMatic Lifeguard (2022), §4.6.3 et §9.1 | contrôleur | — | liaison avec les pompes SP400BT / PM400BT et consigne VSD « disponibles dans une future révision du firmware » |
-| Appareil de test (API) | contrôleur / électrolyseur | `04.01.04` / `05.01.02` | VSD déclarée : la fonction annoncée en 2022 a donc bien été livrée |
+| Appareil de test (API) | contrôleur / électrolyseur | `04.01.04` / `05.01.02` | les champs VSD existent dans l'API, mais l'appareil n'a pas de pompe Davey compatible : la livraison de la fonction annoncée en 2022 n'est pas confirmée |
 
 L'écran de démarrage de l'électrolyseur suit le format `DAVEY V<version> <région> <taille>[L]` :
 `AU` ou `EU`, puis 15, 25 ou 35, et `L` pour les modèles *low salt*. Il permet de confirmer le
@@ -147,7 +168,7 @@ l'appareil est à jour.
 | `heatPump` vide | consigne de température sans objet |
 | Pompe à chaleur Nirvana | pilotage via l'API Nirvana (`ws.nirvanahp.com:8010`) en plus de `targets.temp` |
 | Pompe à chaleur Aquark | pilotage via le cloud Tuya |
-| `isVsdPumpConnected` | vitesse VSD réglable (2–10) |
+| `isVsdPumpConnected` et pompe Davey compatible reliée | vitesse VSD réglable (2–10). Sans pompe compatible, le réglage est sans effet |
 | `saltStatus == 1` | idéal de sel 2250 ppm au lieu de 4500 |
 | `flow == 0` | toutes les mesures invalides |
 | `isConnected == false` | aucune commande possible, mesures invalides |
@@ -164,7 +185,7 @@ l'appareil est à jour.
 | `nipperCell` | 25 | 25 g/h |
 | `saltStatus` | 0 | sel normal (3000–6000 ppm). Mesure de 4462 ppm, cohérente |
 | `io` | `00001111` | 4 sondes : pH, ORP, sel, température |
-| `isVsdPumpConnected` | `true` (vitesse 8) | pompe VSD déclarée |
+| `isVsdPumpConnected` | `true` (vitesse 8) | valeur de configuration seulement : la pompe de filtration est d'une autre marque et n'est pas pilotée par le contrôleur |
 | `heatPump` | `null` | pas de pompe à chaleur |
 | Firmwares | `04.01.04` / `05.01.02` | — |
 | Rôle du compte | `ADMIN` | tous les réglages autorisés |
@@ -183,4 +204,5 @@ Fonctions effectivement pilotables pour ce profil :
 | Consigne pH, consigne ORP | ✅ |
 | Consigne cellule % | ❌ sonde ORP présente |
 | Consigne de température | ❌ pas de pompe à chaleur |
-| Vitesse VSD, durées boost / backwash | ✅ |
+| Vitesse VSD | ❌ sans effet : pas de pompe Davey compatible |
+| Durées boost / backwash | ✅ |

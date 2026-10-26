@@ -154,7 +154,7 @@ Chaque sonde s'active ou se désactive avec le drapeau `*Connected` correspondan
 | `orpConnected = true` | régulation sur la consigne ORP. `cell` n'a plus d'effet |
 | `phConnected = false` | plus de régulation du pH (pompe à acide) |
 | `tempConnected = false` | plus de mesure de température |
-| `isVsdPumpConnected` | indique qu'une pompe de filtration à vitesse variable est raccordée |
+| `isVsdPumpConnected` | déclare une pompe VSD Davey reliée au contrôleur, dont la vitesse suit `vsdPumpSpeed` (supposé). Ce n'est pas une détection : sans pompe compatible, sans effet |
 
 🏠 Exposer ces drapeaux comme `switch` de **configuration**, désactivés par défaut et
 accompagnés d'un avertissement : couper une sonde change le mode de régulation.
@@ -179,9 +179,13 @@ l'écriture est ajoutée, reproduire les contraintes ci-dessus.
 
 - `boostDuration` : 6, 12, 18 ou 24 h.
 - `backwashDuration` : 120, 180, 240 ou 300 s (2 à 5 min).
-- `vsdPumpSpeed` : 2, 4, 6, 8 ou 10, avec `isVsdPumpConnected`.
+- `vsdPumpSpeed` : 2, 4, 6, 8 ou 10, avec `isVsdPumpConnected`. N'agit que sur une pompe Davey
+  compatible (voir [models-and-firmware.md](models-and-firmware.md#pompe-vsd)).
 
 Ces trois réglages passent par `change-target`.
+
+🏠 Créer l'entité « vitesse VSD » **désactivée par défaut** : `isVsdPumpConnected` ne garantit
+pas qu'une pompe compatible est reliée.
 
 ## 5. Alertes
 

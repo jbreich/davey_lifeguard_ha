@@ -3,12 +3,15 @@
 ## Sources
 
 1. **Appels réels en lecture seule** sur un compte propriétaire (rôle ADMIN), avec un appareil
-   en firmware `04.01.04`, électrolyseur `05.01.02`, région Europe, cellule 25 g/h et pompe VSD.
+   en firmware `04.01.04`, électrolyseur `05.01.02`, région Europe et cellule 25 g/h. Le drapeau
+   de pompe VSD est activé, mais la pompe de filtration est d'une autre marque et n'est pas
+   pilotée par le contrôleur.
 2. Une capture réseau publique de 2023 (dépôt GitHub `ggear/asystem`), limitée à `/user/auth`
    et `/user/redeem-invite`.
 3. La documentation commerciale Davey (fiche technique ProMatic Lifeguard `DWP1837/SUK0524`,
-   catalogue ChloroMatic Lifeguard) et les manuels d'installation (ProMatic Lifeguard
-   `DWP1738-4revA` de 2022, ChloroMatic Nipper de 2020).
+   catalogue ChloroMatic Lifeguard, fiche technique de la pompe ProMaster PM400BT) et les
+   manuels d'installation (ProMatic Lifeguard `DWP1738-4revA` de 2022, ChloroMatic Nipper de
+   2020).
 4. Le code de cette intégration Home Assistant.
 
 Les routes d'écriture et les routes à effet de bord sont décrites avec leur format attendu,
@@ -45,6 +48,8 @@ mais leur comportement côté serveur n'a pas été observé : elles sont marqu�
   arbitrage entre modes cumulés (`WINTER` + `COVER`, etc.).
 - Valeurs de `phError` / `orpError` / `saltError` / `flowError` autres que `NORMAL`.
 - Sens des bits 0 à 3 de `io`, de `brand` et de `filtrationPump`.
+- Effet réel de `vsdPumpSpeed` et des `speed` de plannings sur une pompe Davey compatible :
+  l'appareil de test n'en a pas.
 - Durée de validité du token, et validité de l'ancien refresh token après un rafraîchissement.
 - Application des droits côté serveur pour un compte `USER`.
 - Codes Tuya de marche/arrêt et du mode silencieux des pompes Aquark.
